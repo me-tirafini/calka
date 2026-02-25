@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Usia</title>
+    <title>Kalkulator Kader - Ketik Manual</title>
     <style>
         :root { --primary: #27ae60; --dark: #2c3e50; }
         body { font-family: sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
@@ -74,3 +74,32 @@
             months--;
             const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
             days += lastMonth;
+        }
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+
+        const totalBulan = (years * 12) + months;
+
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('fullAge').innerText = `${years}th ${months}bln ${days}hr`;
+        document.getElementById('totalMonths').innerText = `${totalBulan} Bulan`;
+
+        const catBox = document.getElementById('catBox');
+        const catText = document.getElementById('catText');
+        catBox.className = "category-box";
+
+        if (totalBulan >= 6 && totalBulan <= 11) {
+            catText.innerText = "Kategori 1"; catBox.classList.add("cat-1");
+        } else if (totalBulan >= 12 && totalBulan <= 23) {
+            catText.innerText = "Kategori 2"; catBox.classList.add("cat-2");
+        } else if (totalBulan >= 24 && totalBulan <= 59) {
+            catText.innerText = "Kategori 3"; catBox.classList.add("cat-3");
+        } else {
+            catText.innerText = "Luar Kategori"; catBox.style.background = "#95a5a6";
+        }
+    }
+</script>
+</body>
+</html>
