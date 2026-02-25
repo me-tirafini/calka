@@ -11,8 +11,8 @@
         h2 { color: var(--dark); text-align: center; margin-bottom: 20px; font-size: 1.2rem; }
         label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
         
-        /* Input gaya baru */
-        input[type="text"] { 
+        /* Input diperbarui ke type="tel" agar keyboard angka langsung muncul di HP */
+        input { 
             width: 100%; 
             padding: 15px; 
             margin-bottom: 20px; 
@@ -28,16 +28,20 @@
         #result { margin-top: 20px; padding: 15px; border-radius: 8px; background: #eef9f1; display: none; }
         .res-item { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #d1e7dd; padding-bottom: 5px; }
         .res-value { font-weight: bold; }
-        .category-box { margin-top: 15px; padding: 15px; border-radius: 8px; text-align: center; color: white; font-weight: bold; }
-        .cat-1 { background: #3498db; } .cat-2 { background: #e67e22; } .cat-3 { background: #9b59b6; }
+        .category-box { margin-top: 15px; padding: 15px; border-radius: 8px; text-align: center; color: white; font-weight: bold; transition: 0.3s; }
+        .cat-1 { background: #3498db; } 
+        .cat-2 { background: #e67e22; } 
+        .cat-3 { background: #9b59b6; }
+        .cat-lulus { background: #2ecc71; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.02);} 100% {transform: scale(1);} }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h2>Kalkulator Usia Cepat</h2>
-    <label>Tgl Lahir (Tgl/Bln/Thn):</label>
-    <input type="text" id="dobInput" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10">
+    <label>Tgl Lahir (8 Angka):</label>
+    <input type="tel" id="dobInput" placeholder="TglBlnThn (Contoh: 15082023)" maxlength="10">
     
     <button onclick="prosesHitung()">Hitung Sekarang</button>
 
@@ -49,8 +53,9 @@
 </div>
 
 <script>
-    // Fungsi otomatis tambah garis miring saat mengetik
     const input = document.getElementById('dobInput');
+    
+    // Otomatis kasih "/" saat ngetik biar user tinggal input angka saja
     input.addEventListener('input', function(e) {
         let v = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,2})(\d{0,4})/);
         e.target.value = !v[2] ? v[1] : v[1] + '/' + v[2] + (v[3] ? '/' + v[3] : '');
@@ -58,7 +63,7 @@
 
     function prosesHitung() {
         const val = input.value;
-        if (val.length < 10) return alert("Format salah! Gunakan DD/MM/YYYY");
+        if (val.length < 10) return alert("Ketik 8 angka! Contoh: 01012024");
 
         const parts = val.split("/");
         const birthDate = new Date(parts[2], parts[1] - 1, parts[0]);
@@ -90,17 +95,24 @@
         const catText = document.getElementById('catText');
         catBox.className = "category-box";
 
-        if (totalBulan >= 6 && totalBulan <= 11) {
-            catText.innerText = "1(6-11 bulan)"; catBox.classList.add("cat-1");
-        } else if (totalBulan >= 12 && totalBulan <= 23) {
-            catText.innerText = "2(12-23 bulan)"; catBox.classList.add("cat-2");
-        } else if (totalBulan >= 24 && totalBulan <= 59) {
-            catText.innerText = "3(24-59 bulan)"; catBox.classList.add("cat-3");
+        // Logika Kategori & Lulus Posyandu
+        if (totalBulan >= 60) {
+            catText.innerText = "Yey kamu sudah nggak wajib posyandu! 🎓";
+            catBox.classList.add("cat-lulus");
+        } else if (totalBulan >= 24) {
+            catText.innerText = "Kategori 3 (24-59 bulan)"; 
+            catBox.classList.add("cat-3");
+        } else if (totalBulan >= 12) {
+            catText.innerText = "Kategori 2 (12-23 bulan)"; 
+            catBox.classList.add("cat-2");
+        } else if (totalBulan >= 6) {
+            catText.innerText = "Kategori 1 (6-11 bulan)"; 
+            catBox.classList.add("cat-1");
         } else {
-            catText.innerText = "Luar Kategori"; catBox.style.background = "#95a5a6";
+            catText.innerText = "Balita (0-5 bulan)"; 
+            catBox.style.background = "#95a5a6";
         }
     }
 </script>
 </body>
 </html>
-
