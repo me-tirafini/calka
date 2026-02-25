@@ -3,50 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Kader - Kategori Usia</title>
+    <title>Kalkulator Usia</title>
     <style>
-        :root { --primary: #27ae60; --dark: #2c3e50; --accent: #f39c12; }
+        :root { --primary: #27ae60; --dark: #2c3e50; }
         body { font-family: sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { color: var(--dark); text-align: center; margin-bottom: 20px; }
+        h2 { color: var(--dark); text-align: center; margin-bottom: 20px; font-size: 1.2rem; }
         label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
-        input[type="date"] { width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        
+        /* Input gaya baru */
+        input[type="text"] { 
+            width: 100%; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border: 2px solid var(--primary); 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 18px; 
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
         button { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        #result { margin-top: 20px; padding: 15px; border-radius: 8px; background: #fff; border: 1px solid #ddd; display: none; }
-        .res-item { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .res-value { font-weight: bold; color: var(--dark); }
+        #result { margin-top: 20px; padding: 15px; border-radius: 8px; background: #eef9f1; display: none; }
+        .res-item { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #d1e7dd; padding-bottom: 5px; }
+        .res-value { font-weight: bold; }
         .category-box { margin-top: 15px; padding: 15px; border-radius: 8px; text-align: center; color: white; font-weight: bold; }
-        .cat-1 { background-color: #3498db; } /* Biru */
-        .cat-2 { background-color: #e67e22; } /* Orange */
-        .cat-3 { background-color: #9b59b6; } /* Ungu */
-        .cat-none { background-color: #95a5a6; } /* Abu-abu */
+        .cat-1 { background: #3498db; } .cat-2 { background: #e67e22; } .cat-3 { background: #9b59b6; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>Kalkulator Kader</h2>
-    <label>Tanggal Lahir Anak:</label>
-    <input type="date" id="dob" onchange="hitungKategori()">
-    <button onclick="hitungKategori()">Cek Kategori</button>
+    <h2>Kalkulator Usia Cepat</h2>
+    <label>Tgl Lahir (Tgl/Bln/Thn):</label>
+    <input type="text" id="dobInput" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10">
+    
+    <button onclick="prosesHitung()">Hitung Sekarang</button>
 
     <div id="result">
-        <div class="res-item"><span>Total Usia:</span> <span id="fullAge" class="res-value">-</span></div>
-        <div class="res-item"><span>Total Bulan:</span> <span id="totalMonths" class="res-value">-</span></div>
-        
-        <div id="catBox" class="category-box">
-            Kategori: <span id="catText">-</span>
-        </div>
+        <div class="res-item"><span>Usia:</span> <span id="fullAge" class="res-value">-</span></div>
+        <div class="res-item"><span>Total:</span> <span id="totalMonths" class="res-value">-</span></div>
+        <div id="catBox" class="category-box">Kategori: <span id="catText">-</span></div>
     </div>
 </div>
 
 <script>
-    function hitungKategori() {
-        const dobValue = document.getElementById('dob').value;
-        if (!dobValue) return;
+    // Fungsi otomatis tambah garis miring saat mengetik
+    const input = document.getElementById('dobInput');
+    input.addEventListener('input', function(e) {
+        let v = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,2})(\d{0,4})/);
+        e.target.value = !v[2] ? v[1] : v[1] + '/' + v[2] + (v[3] ? '/' + v[3] : '');
+    });
 
-        const birthDate = new Date(dobValue);
+    function prosesHitung() {
+        const val = input.value;
+        if (val.length < 10) return alert("Format salah! Gunakan DD/MM/YYYY");
+
+        const parts = val.split("/");
+        const birthDate = new Date(parts[2], parts[1] - 1, parts[0]);
         const today = new Date();
+
+        if (isNaN(birthDate)) return alert("Tanggal tidak valid!");
 
         let years = today.getFullYear() - birthDate.getFullYear();
         let months = today.getMonth() - birthDate.getMonth();
@@ -56,40 +74,3 @@
             months--;
             const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
             days += lastMonth;
-        }
-        if (months < 0) {
-            years--;
-            months += 12;
-        }
-
-        // Hitung Total Bulan Murni (Penting untuk kategori)
-        const totalBulanMurni = (years * 12) + months;
-
-        // Tampilan Hasil
-        document.getElementById('result').style.display = 'block';
-        document.getElementById('fullAge').innerText = `${years}th ${months}bln ${days}hr`;
-        document.getElementById('totalMonths').innerText = `${totalBulanMurni} Bulan`;
-
-        // Logika Kategori
-        const catBox = document.getElementById('catBox');
-        const catText = document.getElementById('catText');
-        
-        catBox.className = "category-box"; // Reset class
-
-        if (totalBulanMurni >= 6 && totalBulanMurni <= 11) {
-            catText.innerText = "Kategori 1 (6-11 Bln)";
-            catBox.classList.add("cat-1");
-        } else if (totalBulanMurni >= 12 && totalBulanMurni <= 23) {
-            catText.innerText = "Kategori 2 (12-23 Bln)";
-            catBox.classList.add("cat-2");
-        } else if (totalBulanMurni >= 24 && totalBulanMurni <= 59) {
-            catText.innerText = "Kategori 3 (24-59 Bln)";
-            catBox.classList.add("cat-3");
-        } else {
-            catText.innerText = "Di luar Range Kategori";
-            catBox.classList.add("cat-none");
-        }
-    }
-</script>
-</body>
-</html>
